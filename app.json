@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "cpad-online-healthcare",
+    "slug": "cpad-online-healthcare",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
