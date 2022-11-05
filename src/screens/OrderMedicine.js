@@ -12,6 +12,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 function OrderMedicine() {
   const [searchQuery, setSearchQuery] = useState("");
   const [availableMedicines, setavailableMedicines] = useState([]);
+  const [cart, setCart] = useState([]);
 
   const onChangeSearch = (query) => setSearchQuery(query);
   const [txns, settxns] = useState([]);
@@ -48,14 +49,39 @@ function OrderMedicine() {
 
   };
 
+  const getCart = () => {
+    try {
+      setCart([])
+      axios
+        .get("http://10.0.2.2:5000/api/viewcarts",)
+        .then((response) => {
+          response.data.map((cartItem) => {
+            if (cartItem.cartId === 1) {
+              setCart(oldArray => [...oldArray, cartItem])
+            }
+          })
+        })
+        // .catch(error => console.log(error));
+    } catch (error) {
+      // console.error(error);
+    } finally {
+
+    }
+
+  }
+
   useEffect(() => {
     getMedicines()
     getTxns()
+    console.log(cart)
   }, []);
 
   const [visible, setVisible] = useState(false);
 
-  const showDialog = () => setVisible(true);
+  const showDialog = () => {
+    getCart()
+    setVisible(true);
+  } 
 
   const hideDialog = () => setVisible(false);
   return (
@@ -73,6 +99,7 @@ function OrderMedicine() {
           <View style={styles.body}>
             {searchQuery
               ? availableMedicines.map((medicine, index) => {
+                // console.log("Medicine id " +medicine.medicineId)
                 if (
                   medicine.medicineName
                     .toLocaleLowerCase()
@@ -88,7 +115,11 @@ function OrderMedicine() {
               })
               : availableMedicines.map((medicine, index) => {
                 return (
-                  <CardComponent key={index} name={medicine.medicineName}></CardComponent>
+                  <CardComponent
+                    key={index}
+                    name={medicine.medicineName}
+                    medicineId={medicine.medicineId}
+                  ></CardComponent>
                 );
               })}
           </View>
@@ -114,7 +145,7 @@ function OrderMedicine() {
           {
             txns.length != 0 ?
               txns.map((txn, index) => {
-                console.log(txn)
+                // console.log(txn)
                 return (<DataTable.Row key={Math.floor(Math.random() * 10000)}>
                   <DataTable.Cell key={Math.floor(Math.random() * 10000)}>{txn.medicineName}</DataTable.Cell>
                   <DataTable.Cell numeric key={Math.floor(Math.random() * 10000)}>{txn.quantity}</DataTable.Cell>
@@ -140,11 +171,12 @@ function OrderMedicine() {
                 <Dialog.Title>Cart</Dialog.Title>
                 <Dialog.Content>
                   <View>
-                    <Text >Paracetamol : 10</Text>
-                    <Text >Paracetamol : 10</Text>
-                    <Text >Paracetamol : 10</Text>
-                    <Text >Paracetamol : 10</Text>
-                    <Text >Paracetamol : 10</Text>
+                    {cart.map((item,index) =>
+                     {
+                      // console.log(item)
+                      return( <Text key={Math.floor(Math.random() * 10000)}>{item.medicineName} : {item.quantity}</Text>)
+                     })
+                    }
                   </View>
                 </Dialog.Content>
                 <Dialog.Actions>
